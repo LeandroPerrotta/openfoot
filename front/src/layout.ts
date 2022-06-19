@@ -17,7 +17,7 @@ export class Layout {
                     ])
                 ]),
             ]),
-            m("section", vnode.children)
+            m(".wrapper", vnode.children)
         ])
     }
 }

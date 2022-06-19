@@ -1,0 +1,36 @@
+.game {
+    background-color: #ddefdcba;
+    border: #356a44 2px solid;
+    margin: 12px;
+    border-radius: 2px;
+    flex: 1;
+    box-shadow: #508150 1px 1px 3px 2px;
+}
+
+.game-bar{
+    background-color: #ffffc8;
+    height: 45px;
+    margin-top: 5px;
+    line-height: 40px;
+    border: #d0fced solid 1px;
+    border-radius: 4px;    
+}
+
+.team-visitor-name{
+    text-align: right;
+}
+
+.game-bar-controls{
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    margin-top: 20px;
+}
+
+.team-visitor-score, .team-home-score{
+
+    background-color: #c7eabe;
+    border-left: #96ffba30 solid;
+    border-right: #96ffba30 solid;
+    font-weight: bold;
+}
