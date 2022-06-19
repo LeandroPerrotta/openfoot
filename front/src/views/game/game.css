@@ -5,32 +5,91 @@
     border-radius: 2px;
     flex: 1;
     box-shadow: #508150 1px 1px 3px 2px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
-.game-bar{
+.game>div {
+    flex: 0;
+}
+
+.game-bar {
     background-color: #ffffc8;
     height: 45px;
     margin-top: 5px;
     line-height: 40px;
     border: #d0fced solid 1px;
-    border-radius: 4px;    
+    border-radius: 4px;
+    display: flex;
+    flex-direction: row;
+    width: 80%;
 }
 
-.team-visitor-name{
+.team-home,
+.team-visitor {
+    flex: 0 35%;
+    display: flex;
+    flex-direction: row;
+}
+
+.center {
+    flex: 0 30%;
+    display: flex;
+    flex-direction: row;
+}
+
+.team-home > div,
+.team-visitor > div,
+.center > div{
+
+    flex: 1;
+}
+
+.timer {
+    text-align: center;
+}
+
+.team-visitor-name {
     text-align: right;
+    margin-right: 20px;
 }
 
-.game-bar-controls{
+.team-home-name {
+    margin-left: 20px;
+}
+
+.game-bar-controls {
     align-items: center;
     display: flex;
     flex-direction: column;
     margin-top: 20px;
 }
 
-.team-visitor-score, .team-home-score{
+.team-visitor-score,
+.team-home-score {
 
     background-color: #c7eabe;
     border-left: #96ffba30 solid;
     border-right: #96ffba30 solid;
     font-weight: bold;
+    flex: 0 15% !important;
+    text-align: center;
+}
+
+.game-balance{
+    display: flex;
+    flex-direction: row;
+    height: 27px;
+    width: 80%;
+    border: #c8c8c8 solid 1px;
+    background-color: #017101;
+}
+
+.game-balance canvas{
+    flex: 1;
+}
+
+#game-ball{
+    display: none;
 }
