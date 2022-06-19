@@ -13,6 +13,7 @@ It's at ridiculous early developing stage. Currently the game is not even playab
 ### What kind of tecnhologies is used?
 
 Front-end: Typescript, Mithil
+
 Server/Back-end: Typescript
 
 ### How to run
@@ -22,15 +23,23 @@ Right now, not much you will see by runing the game. But if you want...
 [After clone repository...]
 
 Front-end
+
 ``cd front && npm install``
+
 ``cd src``
+
 ``ln -s ../../shared shared``
+
 ``npm run start``
 
 [back root directory...]
 
 Back-end
+
 ``cd game && npm install``
+
 ``cd src``
+
 ``ln -s ../../shared shared``
+
 ``npm run start``
