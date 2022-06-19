@@ -2,33 +2,24 @@ import m from "mithril";
 import { Connection } from "../../net/connection";
 import { ClientMessageTypes, ServerMessageType } from "../../shared/net/net.type";
 import { GameScore } from "../../shared/game.type";
-
+import { GameBalance } from "../../components/canvas/game-balance";
 import "./game.css";
+
 
 export class Game {
 
     private timer: number = 0;
     private score: GameScore = { home: 0, visitor: 0 };
-    private canvas: HTMLCanvasElement | null = null;
-    private context: CanvasRenderingContext2D | null = null;
-    private ball: CanvasImageSource;
+    private balance: GameBalance | null = null;
 
     constructor() {
-
-        this.ball = new Image();
-        this.ball.src = 'assets/game/ball.png'
 
         Connection.registerMessageCallback(ServerMessageType.GameTimer, this.onGameTimer.bind(this));
     }
 
-    oncreate() {
+    oncreate(){
 
-        this.canvas = document.getElementById('game-balance-canvas') as HTMLCanvasElement;
-
-        this.canvas.width = document.getElementsByClassName('game-balance')[0].clientWidth;
-        this.canvas.height = document.getElementsByClassName('game-balance')[0].clientHeight;
-
-        this.context = this.canvas.getContext('2d');
+        this.balance = new GameBalance();
     }
 
     view() {
@@ -60,25 +51,6 @@ export class Game {
         ])
     }
 
-    renderBall(currentBalance: number) {
-
-        if(!this.context || !this.canvas) {
-
-            console.error('No canvas found');
-            return;
-        }
-
-        this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);     
-
-        console.log(this.canvas.width, this.canvas.height)
-
-        const width = this.canvas.width;
-        const y = 1;
-        const x = this.canvas.width / 100 * currentBalance;
-
-        this.context.drawImage(this.ball, x, y);
-    }
-
     onGameStart() {
 
         console.log('Game started')
@@ -88,11 +60,21 @@ export class Game {
     onGameTimer(data: any) {
 
         this.timer = data.timer;
+
+        const scoreChanged = this.score.home != data.score.home || this.score.visitor != data.score.visitor;
+
         this.score = data.score;
 
         m.redraw();
-        this.renderBall(data.balance)
+        
+        this.balance?.moveBallTo(data.balance, scoreChanged)
 
+        if(this.timer == 90){
+
+            this.balance?.stop();
+        }
+
+        
         console.log('Timer', this.timer)
     }
 }
