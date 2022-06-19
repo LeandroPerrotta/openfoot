@@ -1,0 +1,32 @@
+.layout{
+    display: flex;
+    flex-direction: column;
+}
+
+.header{
+    flex: 1;
+    background-color: #394539;
+    height: 50px;
+
+    display: flex;
+    flex-direction: row;
+    padding-left: 20px;
+    padding-right: 20px;
+}
+
+.header div{
+    flex: 1;
+}
+
+.logo{
+    color: #ffff66;
+    font-weight: bold;
+    text-shadow: -2px 1px 3px #32863f;
+    font-size: 16pt;
+    flex: 0 !important;
+    margin-block: auto;
+}
+
+.nav.menu{
+    flex: 0 !important;
+}
