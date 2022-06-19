@@ -22,6 +22,7 @@ Right now, not much you will see by runing the game. But if you want...
 [After clone repository...]
 
 Front-end
+
 ``cd front && npm install``
 
 ``cd src``
@@ -33,6 +34,7 @@ Front-end
 [back root directory...]
 
 Back-end
+
 ``cd game && npm install``
 
 ``cd src``
