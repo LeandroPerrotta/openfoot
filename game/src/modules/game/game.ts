@@ -3,6 +3,43 @@ import { ClientMessageTypes, ServerMessageType } from "../../shared/net/net.type
 
 export class Game{
 
+    private timer = 0;
+    private balance = 50;
+    private client: Client;
+
+    constructor(client: Client){
+
+        this.client = client;
+    }
+
+    startGame(){
+
+        this.onThink();
+    }
+
+    endGame(){
+
+        for(const index in Game._games){
+
+            if(this === Game._games[index]){
+                delete Game._games[index];
+                return;
+            }
+        }
+    }
+
+    onThink(){
+
+        this.timer = this.timer + 1;
+
+        this.client.send(ServerMessageType.GameTimer, { timer: this.timer });
+
+        if(this.timer < 90){
+            setTimeout(this.onThink.bind(this), 1000)
+        }
+    }
+
+    private static _games: Game[] = [];
     static init(){
 
         Client.registerMessageCallback(ClientMessageTypes.GameStart, this.onPlayerStartGame)
@@ -12,20 +49,9 @@ export class Game{
 
         console.log('Player started game!')
 
-        let timer = 0;
+        const game = new Game(client);
+        Game._games.push(game);
 
-        Game.gameTick(client, timer);
+        game.startGame();
     }
-
-    static gameTick(client: Client, timer: number){
-
-        timer = timer + 1;
-
-        client.send(ServerMessageType.GameTimer, { timer });
-
-        if(timer < 90){
-            setTimeout(Game.gameTick, 1000, client, timer)
-        }
-    }
-
 }
