@@ -23,14 +23,20 @@ Right now, not much you will see by runing the game. But if you want...
 
 Front-end
 ``cd front && npm install``
+
 ``cd src``
+
 ``ln -s ../../shared shared``
+
 ``npm run start``
 
 [back root directory...]
 
 Back-end
 ``cd game && npm install``
+
 ``cd src``
+
 ``ln -s ../../shared shared``
+
 ``npm run start``
