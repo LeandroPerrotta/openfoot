@@ -13,6 +13,7 @@ It's at ridiculous early developing stage. Currently the game is not even playab
 ### What kind of tecnhologies is used?
 
 Front-end: Typescript, Mithil
+
 Server/Back-end: Typescript
 
 ### How to run
