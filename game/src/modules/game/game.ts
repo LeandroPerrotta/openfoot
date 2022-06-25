@@ -11,25 +11,32 @@ export class Game {
     private score: GameScore = { home: 0, visitor: 0 };
     private balance = 50;
 
+    private event: NodeJS.Timeout;
+
     constructor(client: Client) {
 
         this.client = client;
+        this.event = this.runTimer();
     }
 
-    startGame() {
+    runTimer() {
 
-        this.onThink();
+        return setTimeout(this.onThink.bind(this));
     }
 
     endGame() {
 
-        for (const index in Game._games) {
+        Game._games.delete(this.client.clientIndex);
+    }
 
-            if (this === Game._games[index]) {
-                delete Game._games[index];
-                return;
-            }
-        }
+    pauseGame() {
+
+        clearTimeout(this.event);
+    }
+
+    resumeGame() {
+
+        this.event = this.runTimer();
     }
 
     ballControl() {
@@ -43,7 +50,7 @@ export class Game {
         else if (randomValue <= 66) {
             balanceChange = Tools.random(0, 2);;
         }
-        else{
+        else {
             balanceChange = Tools.random(2, 6);
         }
 
@@ -79,17 +86,18 @@ export class Game {
         this.client.send(ServerMessageType.GameTimer, { timer: this.timer, balance: this.balance, score: this.score });
 
         if (this.timer < 90) {
-            setTimeout(this.onThink.bind(this), 1000)
+            this.event = setTimeout(this.onThink.bind(this), 1000)
         }
         else {
             this.endGame();
         }
     }
 
-    private static _games: Game[] = [];
+    private static _games: Map<number, Game> = new Map();
     static init() {
 
         Client.registerMessageCallback(ClientMessageTypes.GameStart, this.onPlayerStartGame)
+        Client.registerMessageCallback(ClientMessageTypes.GamePause, this.onPlayerPauseGame)
     }
 
     static onPlayerStartGame(client: Client) {
@@ -97,8 +105,22 @@ export class Game {
         console.log('Player started game!')
 
         const game = new Game(client);
-        Game._games.push(game);
+        Game._games.set(client.clientIndex, game);
+    }
 
-        game.startGame();
+    static onPlayerPauseGame(client: Client, data: any) {
+
+        const game = Game._games.get(client.clientIndex);
+
+        if (!game) {
+            throw new Error(`No game started for connecton #${client.clientIndex}`);
+        }
+
+        if(data.type == "pause") {
+            game.pauseGame();
+        }
+        else{
+            game.resumeGame();
+        }
     }
 }

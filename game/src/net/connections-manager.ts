@@ -5,7 +5,7 @@ import { Client } from './client';
 const SERVER_PORT = 8090
 
 type ConnectionType = {
-    game?: Connection;
+    game?: Clients;
 }
 
 export class ConnectionsManager{
@@ -14,7 +14,7 @@ export class ConnectionsManager{
 
     static createGameConnection(){
 
-        const protocol = new Connection();
+        const protocol = new Clients();
         this._connections.game = protocol;
     }
 
@@ -28,7 +28,7 @@ export class ConnectionsManager{
     }
 }
 
-class Connection{
+export class Clients{
 
     private socket: server;
     private http: http.Server;
@@ -53,12 +53,16 @@ class Connection{
 
         this.socket.on('request', (request) => {
 
-            const connection = request.accept('echo-protocol', request.origin);
-
-            const client = new Client(connection);
-            const index = this.clients.push(client);
-            client.clientIndex = index;
+            const client = request.accept('echo-protocol', request.origin);
+            new Client(this, client);
         })
+    }
+
+    addClient(client: Client){
+        const index = this.clients.push(client);
+        client.clientIndex = index;
+
+        return index;
     }
 
     onClientClose(client: Client){

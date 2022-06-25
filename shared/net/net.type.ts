@@ -7,7 +7,8 @@ export enum ServerMessageType {
 
 export enum ClientMessageTypes {
     GameStart,
+    GamePause,
 
     First = GameStart,
-    Last = GameStart
+    Last = GamePause
 }

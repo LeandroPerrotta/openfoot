@@ -12,6 +12,9 @@ export class Game {
     private score: GameScore = { home: 0, visitor: 0 };
     private balance: GameBalance | null = null;
 
+    private labelPause = "Pause";
+    private gameStarted = false;
+
     constructor() {
 
         Connection.registerMessageCallback(ServerMessageType.GameTimer, this.onGameTimer.bind(this));
@@ -46,14 +49,30 @@ export class Game {
             ]),
 
             m('.game-bar-controls', [
-                m('button.btn.btn-warning', { type: 'button', onclick: this.onGameStart.bind(this) }, 'Play!')
+                m('button.btn.btn-green', { onclick: this.onGameStart.bind(this), disabled: this.gameStarted }, 'Play!'),
+                m('button.btn.btn-yellow', { onclick: this.onGamePause.bind(this), disabled: !this.gameStarted }, this.labelPause)
             ])
         ])
     }
 
+    onGamePause() {
+
+        if(this.labelPause == "Pause") {
+
+            Connection.send(ClientMessageTypes.GamePause, { type: 'pause' })
+            this.labelPause = 'Resume'
+        }
+        else{
+
+            Connection.send(ClientMessageTypes.GamePause, { type: 'resume' })
+            this.labelPause = 'Pause'
+        }
+        
+    }
+
     onGameStart() {
 
-        console.log('Game started')
+        this.gameStarted = true;
         Connection.send(ClientMessageTypes.GameStart, 'game started')
     }
 

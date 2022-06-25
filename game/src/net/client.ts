@@ -1,15 +1,15 @@
 import { connection, Message } from 'websocket';
 import { ClientMessageTypes, ServerMessageType } from '../shared/net/net.type';
-import { ConnectionsManager } from './connections-manager';
+import { ConnectionsManager, Clients } from './connections-manager';
 
 export type MessageCallbacks = Map<ClientMessageTypes, Function>;
 
 export class Client{
 
     private connection: connection;
-    public clientIndex: number | null = null;
+    public clientIndex: number;
 
-    constructor(connection: connection){
+    constructor(clients: Clients, connection: connection){
 
         this.connection = connection;
 
@@ -19,7 +19,7 @@ export class Client{
 
         console.info('[Client]', 'Client connected!')
 
-        this.connection.sendUTF('Hello world');
+        this.clientIndex = clients.addClient(this);
     }
 
     onRecvMessage(message: Message){
