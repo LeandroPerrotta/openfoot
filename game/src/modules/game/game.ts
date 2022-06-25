@@ -1,6 +1,6 @@
 import { Client } from "../../net/client";
 import { Tools } from "../../shared";
-import { GameScore } from "../../shared/game.type";
+import { GameScore, GameTeam } from "../../shared/game.type";
 import { ClientMessageTypes, ServerMessageType } from "../../shared/net/net.type";
 
 export class Game {
@@ -8,7 +8,7 @@ export class Game {
     private client: Client;
 
     private timer = 0;
-    private score: GameScore = { home: 0, visitor: 0 };
+    private score: GameScore = { [GameTeam.Home]: 0, [GameTeam.Visitor]: 0 };
     private balance = 50;
 
     private event: NodeJS.Timeout;
@@ -39,10 +39,81 @@ export class Game {
         this.event = this.runTimer();
     }
 
+    updateClient() {
+
+        this.client.send(ServerMessageType.GameTimer, { timer: this.timer, balance: this.balance, score: this.score });
+    }
+
+    changeScore(balanceChange: number) {
+
+        let goalMessage = 'GOOOOL!'
+        let goalTeam = balanceChange > 0 ? GameTeam.Home : GameTeam.Visitor;
+
+        this.score[goalTeam]++;
+        this.restartGameBalance();
+
+        this.client.send(ServerMessageType.GameGoal, { message: goalMessage, goalTeam: goalTeam})
+
+        setTimeout(this.resumeGame.bind(this), 5000)
+    }
+
+    restartGameBalance() {
+
+        this.balance = 50;
+    }
+
+    penalty(balanceChange: number) {
+
+        let penaltyChance = 0;
+
+        if (balanceChange > 0 && this.balance > 80)
+            penaltyChance = this.balance + balanceChange >= 95 ? 10 : 5;
+        else if (balanceChange < 0 && this.balance < 20) {
+            penaltyChance = this.balance - balanceChange <= 5 ? 10 : 5;
+        }
+
+        if (Tools.random(1, 100) > penaltyChance) {
+
+            return false;
+        }
+
+        setTimeout(() => {
+            this.client.send(ServerMessageType.GamePenaltie, { message: 'PENALTI!' });
+        })
+
+        setTimeout(() => {
+            this.client.send(ServerMessageType.GamePenaltie, { message: '3...' });
+        }, 2000)
+
+        setTimeout(() => {
+            this.client.send(ServerMessageType.GamePenaltie, { message: '2...' });
+        }, 4000)
+
+        setTimeout(() => {
+            this.client.send(ServerMessageType.GamePenaltie, { message: '1...' });
+        }, 6000)
+
+        setTimeout(() => {
+
+            const goal = Tools.random(1, 100) > 20 ? true : false;
+
+            if (goal)
+                this.changeScore(balanceChange)
+            else{
+                this.client.send(ServerMessageType.GamePenaltie, { message: 'DEFENDEUU!', last: true });
+                setTimeout(this.resumeGame.bind(this), 2000);
+            }            
+                
+        }, 8000)
+
+        return true;
+
+    }
+
     ballControl() {
 
         const randomValue = Tools.random(1, 100);
-        let balanceChange;
+        let balanceChange: number;
 
         if (randomValue <= 33) {
             balanceChange = -Tools.random(2, 6);
@@ -51,13 +122,19 @@ export class Game {
             balanceChange = Tools.random(0, 2);;
         }
         else {
-            balanceChange = Tools.random(2, 6);
+            balanceChange = Tools.random(4, 8);
+        }
+
+        if (this.penalty(balanceChange)) {
+
+            this.updateClient();
+            return false;
         }
 
         /* contra ataque */
-        if (this.balance >= 70 && balanceChange < 0 && Tools.random(1, 100) < 10) {
+        if (this.balance >= 70 && balanceChange < 0 && Tools.random(1, 100) < 15) {
 
-            balanceChange = -Tools.random(50, 70);
+            balanceChange = -Tools.random(60, 80);
         }
         else if (this.balance <= 30 && balanceChange > 0 && Tools.random(1, 100) < 10) {
 
@@ -66,24 +143,23 @@ export class Game {
 
         this.balance = Math.max(Math.min(this.balance + balanceChange, 100), 0);
 
-        if (this.balance == 100) {
+        if (this.balance == 100 || this.balance == 0) {
 
-            this.score.home++;
-            this.balance = 50;
+            this.changeScore(balanceChange);
+            return false;
         }
-        else if (this.balance == 0) {
 
-            this.score.visitor++;
-            this.balance = 50;
-        }
+        return true;
     }
 
     onThink() {
 
         this.timer = this.timer + 1;
-        this.ballControl();
+        if (!this.ballControl()) {
+            return;
+        }
 
-        this.client.send(ServerMessageType.GameTimer, { timer: this.timer, balance: this.balance, score: this.score });
+        this.updateClient();
 
         if (this.timer < 90) {
             this.event = setTimeout(this.onThink.bind(this), 1000)
@@ -116,10 +192,10 @@ export class Game {
             throw new Error(`No game started for connecton #${client.clientIndex}`);
         }
 
-        if(data.type == "pause") {
+        if (data.type == "pause") {
             game.pauseGame();
         }
-        else{
+        else {
             game.resumeGame();
         }
     }

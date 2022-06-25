@@ -1,8 +1,10 @@
 export enum ServerMessageType {
     GameTimer,
+    GamePenaltie,
+    GameGoal,
 
     First = GameTimer,
-    Last = GameTimer
+    Last = GameGoal
 }
 
 export enum ClientMessageTypes {

@@ -1,4 +1,9 @@
+export enum GameTeam {
+    Home = 'home',
+    Visitor = 'visitor'
+}
+
 export type GameScore = {
-    home: number;
-    visitor: number;
+    [GameTeam.Home]: number;
+    [GameTeam.Visitor]: number;
 }

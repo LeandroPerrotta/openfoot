@@ -30,7 +30,7 @@ export class Connection {
         const data = JSON.parse(message.data.toString());
 
         const type = Number(data.type);
-        if (isNaN(type) || !(type >= ClientMessageTypes.First && type <= ClientMessageTypes.Last)) {
+        if (isNaN(type) || !(type >= ServerMessageType.First && type <= ServerMessageType.Last)) {
 
             console.error('Unhandled message', data);
             throw new Error('Received unhandled message.');
